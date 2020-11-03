@@ -1,7 +1,13 @@
+<!--
+ * @version: 
+ * @Author: 黄炳圳
+ * @Date: 2020-10-26 23:47:37
+ * @Descripttion: 
+-->
 <template>
   <div id="app">
-    <h1>num1: {{$store.state.num1}}</h1>
-    <h2>num2:{{$store.state.num2}}</h2>
+    <h1>num1: {{ $store.state.num1 }}</h1>
+    <h2>num2:{{ $store.state.num2 }}</h2>
 
     <button @click="handleAdd">mutation add</button>&nbsp;
     <button @click="handleTimeAdd">action add</button>
@@ -9,17 +15,22 @@
 </template>
 
 <script>
-
 export default {
   name: "App",
   methods: {
-    handleAdd(){
-      this.$store.commit('setNum', { num1:this.$store.state.num1+10, num2: this.$store.state.num2+20})
+    handleAdd() {
+      this.$store.commit("setNum", {
+        num1: this.$store.state.num1 + 10,
+        num2: this.$store.state.num2 + 20
+      });
     },
-    handleTimeAdd(){
-      this.$store.dispatch('setTimeNum', { num1:this.$store.state.num1+10, num2: this.$store.state.num2+20})
+    handleTimeAdd() {
+      this.$store.dispatch("setTimeNum", {
+        num1: this.$store.state.num1 + 10,
+        num2: this.$store.state.num2 + 20
+      });
     }
-  },
+  }
 };
 </script>
 
