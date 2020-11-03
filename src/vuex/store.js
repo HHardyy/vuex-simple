@@ -12,6 +12,12 @@ import ModuleCollection from "./moudle/module-collection";
 
 let Vue;
 
+function getState(store, path) {
+  return path.reduce((newState, currState) => {
+    return newState[currState];
+  }, store.state);
+}
+
 function installModule(store, state, path, module) {
   // 获取命名空间
   let namespace = store._modules.getNameSpace(path);
@@ -28,7 +34,13 @@ function installModule(store, state, path, module) {
     store._mutations[namespace + type] =
       store._mutations[namespace + type] || [];
     store._mutations[namespace + type].push(payload => {
-      mutation.call(store, module.state, payload);
+      mutation.call(store, getState(store, path), payload);
+
+      // mutations更新的时候，this._subscribes订阅的事件执行
+      store._subscribes.forEach(sub => sub({
+        mutation,
+        type
+      }, store.state));
     });
   });
 
@@ -59,11 +71,15 @@ class Store {
     let state = this._modules.root.state;
     this._mutations = {};
     this._actions = {};
+    this._subscribes = [];
     this.wrapperGetters = {};
     installModule(this, state, [], this._modules.root);
 
     //3、将状态放到实例中
     resetStoreVm(this, state);
+
+    //4、插件实现
+    options.plugins && options.plugins.forEach(plugin => plugin(this));
 
     // 单独一个模块的时候实现原理
     // let state = options.state
@@ -123,6 +139,12 @@ class Store {
     // 安装模块
     installModule(this, this.state, path, rawModule.newModule);
     resetStoreVm(this, this.state);
+  }
+  subscribe(fn) {
+    this._subscribes.push(fn);
+  }
+  replaceState(newState) {
+    this._vm._data.$$state = newState;
   }
 }
 

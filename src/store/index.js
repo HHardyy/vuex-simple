@@ -6,11 +6,26 @@
  */
 import Vue from "vue";
 // import Vuex from "vuex";
+// import Vuex from "../vuex/index";
 import Vuex from "../vuex/index";
+// import logger from "vuex/dist/logger";
 
 Vue.use(Vuex);
 
+// 持久化插件
+function persists(store) {
+  let local = localStorage.getItem("vuex:state");
+  if (local) {
+    store.replaceState(JSON.parse(local));
+  }
+
+  store.subscribe((mutation, state) => {
+    localStorage.setItem("vuex:state", JSON.stringify(state));
+  });
+}
+
 const store = new Vuex.Store({
+  plugins: [persists],
   state: {
     num1: 10,
     num2: 20
